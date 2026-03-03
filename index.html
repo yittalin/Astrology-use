@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星光煉金術：1分鐘占星文法挑戰</title>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2f4f 50%, #0d1b2a 100%);
+            color: #e8eef7;
+            overflow: hidden;
+        }
+
+        /* Starfield animation */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Stars background */
+        .stars-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a8dadc, #457b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timer {
+            font-size: 32px;
+            font-weight: 700;
+            color: #a8dadc;
+            text-shadow: 0 0 10px rgba(168, 218, 220, 0.5);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .counter {
+            font-size: 16px;
+            color: #f1faee;
+            padding: 8px 16px;
+            background: rgba(70, 123, 157, 0.3);
+            border-radius: 20px;
+            border: 1px solid #457b9d;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(31, 58, 89, 0.4);
+            border: 1px solid rgba(168, 218, 220, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .side.left {
+            border-color: rgba(241, 250, 254, 0.2);
+        }
+
+        .side.right {
+            border-color: rgba(168, 218, 220, 0.3);
+        }
+
+        .side-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a8dadc;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .zodiac-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1faee;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .planet-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #a8dadc;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .word-type {
+            margin-bottom: 12px;
+        }
+
+        .word-type-label {
+            font-size: 12px;
+            color: #a8dadc;
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+
+        .words-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 180px; 
+            overflow-y: auto;
+            align-content: flex-start;
+        }
+
+        .word-btn {
+            padding: 6px 12px;
+            background: rgba(70, 123, 157, 0.3);
+            border: 1px solid rgba(168, 218, 220, 0.4);
+            color: #e8eef7;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .word-btn:hover {
+            background: rgba(70, 123, 157, 0.5);
+            border-color: #a8dadc;
+            color: #a8dadc;
+        }
+
+        .word-btn.selected {
+            background: rgba(168, 218, 220, 0.6);
+            border-color: #a8dadc;
+            color: #0f1419;
+            font-weight: 600;
+            box-shadow: 0 0 12px rgba(168, 218, 220, 0.4);
+        }
+
+        .center-area {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .combine-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #a8dadc, #457b9d);
+            border: none;
+            color: #0f1419;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .combine-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(168, 218, 220, 0.4);
+        }
+
+        .combine-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .status-icon {
+            font-size: 24px;
+        }
+
+        /* Game States */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .start-screen h2 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #a8dadc, #457b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .start-screen p {
+            font-size: 16px;
+            color: #b8c6db;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .start-btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #a8dadc, #457b9d);
+            border: none;
+            color: #0f1419;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(168, 218, 220, 0.3);
+        }
+
+        .result-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-header h2 {
+            font-size: 24px;
+            color: #a8dadc;
+            margin-bottom: 10px;
+        }
+
+        .result-score {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a8dadc, #f1faee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .combinations-list {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .combination-item {
+            padding: 12px;
+            background: rgba(70, 123, 157, 0.3);
+            border: 1px solid rgba(168, 218, 220, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .combination-item .header {
+            color: #f1faee;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .combination-item .planet {
+            color: #a8dadc;
+            opacity: 0.8;
+            margin-right: 4px;
+        }
+
+        .combination-item .phrase {
+            color: #a8dadc;
+            font-size: 21px;
+            font-weight: 700;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            padding: 10px 24px;
+            background: rgba(168, 218, 220, 0.2);
+            border: 1px solid #a8dadc;
+            color: #a8dadc;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(168, 218, 220, 0.3);
+            box-shadow: 0 4px 12px rgba(168, 218, 220, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+  <div class="stars-bg" id="starsBg"></div>
+  <div class="container">
+   <div class="content">
+    <div id="startScreen" class="start-screen">
+     <h2>✨ 星光煉金術 ✨</h2>
+     <p>1分鐘內，快速組合星座的文法力量與行星的能量詞彙，創造獨特的占星句子吧！</p>
+     <button class="start-btn" onclick="startGame()">開始挑戰</button>
+    </div>
+    
+    <div id="gameScreen" class="hidden">
+     <div class="header">
+      <h1>⚡ 星光煉金術：文法組合戰 ⚡</h1>
+      <div class="timer-container">
+       <div class="timer" id="timer">60</div>
+       <div class="counter">已完成: <span id="completedCount">0</span> 組</div>
+      </div>
+     </div>
+     <div class="game-area">
+      <div class="side left">
+       <div class="side-title">⭐ 星座能量</div>
+       <div class="zodiac-name" id="zodiacName"></div>
+       <div class="word-type">
+        <div class="word-type-label">形容詞</div>
+        <div class="words-container" id="adjContainer"></div>
+       </div>
+       <div class="word-type">
+        <div class="word-type-label">副詞</div>
+        <div class="words-container" id="advContainer"></div>
+       </div>
+      </div>
+      
+      <div class="center-area">
+       <div id="statusIcon" class="status-icon">🌙</div>
+       <button class="combine-btn" id="combineBtn" onclick="combineWords()" disabled> 組合 </button>
+      </div>
+      
+      <div class="side right">
+       <div class="side-title">🔥 行星力量</div>
+       <div class="planet-name" id="planetName"></div>
+       <div class="word-type">
+        <div class="word-type-label">名詞</div>
+        <div class="words-container" id="nounContainer"></div>
+       </div>
+       <div class="word-type">
+        <div class="word-type-label">動詞</div>
+        <div class="words-container" id="verbContainer"></div>
+       </div>
+      </div>
+     </div>
+    </div>
+    
+    <div id="resultScreen" class="result-screen hidden">
+     <div class="result-header">
+      <h2>🌟 挑戰完成！</h2>
+      <div class="result-score" id="finalScore">0</div>
+      <p style="color: #a8dadc; margin-top: 8px;">組占星文法組合</p>
+     </div>
+     <div class="combinations-list" id="combinationsList"></div>
+     <div class="result-actions">
+      <button class="combine-btn" onclick="restartGame()">再次挑戰</button> 
+      <button class="btn-secondary" onclick="shareResult()">分享結果</button>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <script>
+        // Data
+   const planets = [
+    {
+        name: '太陽',
+        noun: ['父親', '男性伴侶', '英雄', '演員', '男主角', '生命中重要的人物', '生命的力量', '追求的事情', '成為英雄的事', '成就自己生命的事情', '自我的尋找', '黃金', '心臟', '發光發亮的東西', '光', '燈', '螢火', '向日葵', '電影院', '戲劇院', '表演舞台', '遊樂園', '健身房', '脊椎'],
+        verb: ['照亮', '拍手', '喝采', '創造', '集中', '圍繞', '表演']
+    },
+    {
+        name: '月亮',
+        noun: ['母親', '女性', '照顧者', '保母', '保全', '廚師', '作家', '畫家', '編劇', '詩人', '護士', '看護', '幼教老師', '照顧', '養育', '扶養', '滋養', '銀', '鏡子', '容器', '烹煮食物的鍋具', '食物', '牛奶', '蘑菇', '餐廳', '幼稚園', '水', '海', '消化系統（特別指胃）', '乳房', '子宮'],
+        verb: ['餵', '養', '吃', '照顧', '哺乳', '滋養', '關懷', '保護']
+    },
+    {
+        name: '水星',
+        noun: ['兄弟姐妹', '鄰居', '親戚', '學生', '同學', '每天與你生活周圍的人', '商人', '傳遞訊息的人', '文字工作者', '業務員', '小學老師', '名嘴', '作家', '傳播人', '創意人', '記者', '導遊', '指揮交通的人', '叫賣的人', '學習', '上課', '溝通', '知識', '新聞', '水銀', '書', '文具', '檔', '教材', '報紙', '電話', '通訊器材', '隨身碟', '交通工具', '鄰近公園', '菜市場', '書店', '圖書館', '小學', '文具行', '影印店', '傳播公司', '雜貨店', '便利商店', '雙手', '手臂', '神經系統', '呼吸器官'],
+        verb: ['聽', '說', '讀', '寫', '學習', '表達', '思考', '移動', '交易', '斡旋']
+    },
+    {
+        name: '金星',
+        noun: ['少女', '女孩', '美女', '戀愛中的女人', '藝術家', '歌手', '音樂家', '設計師', '化妝師', '外交人員', '財務人員', '農夫', '戀愛', '生產', '衡量價值', '評價', '銅', '珠寶', '金錢', '藝術品', '牛', '保險箱', '珠寶盒', '音樂廳', '美術館', '歌劇院', '銀行', '腎臟', '腰', '喉嚨', '脖子', '甲狀腺'],
+        verb: ['喜歡', '愛', '付出', '建立關係', '弱化', '美化', '嬌飾', '包裝']
+    },
+    {
+        name: '火星',
+        noun: ['年輕男性', '戰士', '將軍', '武士', '員警', '冒險家', '軍人', '消防員', '運動員', '牙醫', '歹徒', '外科醫生', '理髮師', '保護', '生氣', '競爭', '攻擊', '性愛', '冒險', '挑戰', '比賽', '發燒', '外傷', '發炎', '戰爭', '技術', '打架', '鐵', '機械', '武器', '工具', '角', '羊', '火', '火把', '打火機', '運動場', '競技場', '賽馬場', '健身房', '頭', '眼睛', '肌肉', '含鐵細胞', '腎上腺'],
+        verb: ['執行', '前進', '取得', '掠奪', '攻擊', '破壞']
+    },
+    {
+        name: '木星',
+        noun: ['法官', '律師', '教授', '富人', '神職人員', '政客', '職業與旅行有關的人', '出版傳播行業的人', '放縱的人', '說謊或冒險的人', '樂觀的人', '貴人', '擴張', '相信', '法律事件', '宗教事件', '冒險事件', '犯罪事件', '出版', '公開的事件', '旅行', '宗教', '流行的事物', '錫', '飛機', '宗教物品', '洋蔥', '蒜', '大學', '教堂', '法院', '肝臟', '腦下垂體', '大腿與臀部'],
+        verb: ['擴大', '探索', '冒險', '成長', '逃脫', '逃避']
+    },
+    {
+        name: '土星',
+        noun: ['父親', '男性長輩', '老年人', '執政者', '老闆', '老師', '上司', '長官', '有野心的人', '執法者', '嚴肅的人', '專家', '研究人員', '仲裁者', '不愉快的事情', '壓抑限制的事件', '責任範圍', '組織架構', '時間', '鉛', '堅固的物品', '沉重的物品', '老舊的物品', '時鐘', '柵欄', '門', '鎖', '牆', '公司', '政府機關', '高山', '骨骼', '牙齒', '膝蓋', '皮膚'],
+        verb: ['阻擋', '壓抑', '限制', '保護', '承擔', '組織', '考驗', '收縮']
+    },
+    {
+        name: '天王星',
+        noun: ['改革者', '反叛者', '獨立的人', '特立獨行的人', '特殊的人', '不受管轄的人', '占星師', '太空人', '科學家', '電腦工程師', '獨立或革命', '改變自我', '改變性的事件', '鈾', '電腦與尖端科技產品', '空氣', '大氣層', 'X光', '放射線', '太空梭', '太空署', '天文臺', '外太空', '小腿', '腳踝', '循環系統'],
+        verb: ['覺醒', '分離', '改變', '背叛', '切割', '解放', '突破', '跨越']
+    },
+    {
+        name: '海王星',
+        noun: ['神父', '修女', '宗教家', '騙子', '藝術家', '理想主義者', '精神異常者', '吸毒者', '酒精中毒者', '電影工作者', '電影', '藝術', '音樂', '舞蹈', '水災', '中毒', '生病', '社會主義', '共產主義', '與聲光藝術有關的事情', '錼', '病毒', '迷幻藥', '麻醉藥', '毒品', '化學物品', '人工合成品', '攝影機', '照相機', '霧', '大海', '醫院', '監獄', '美術館', '電影院', '慈善機構', '腳掌', '視覺神經'],
+        verb: ['犧牲', '逃避', '迷失', '消融', '腐蝕', '救贖', '擴散', '精煉', '上癮', '臣服', '放棄', '撤除']
+    },
+    {
+        name: '冥王星',
+        noun: ['礦工', '殯葬業者', '恐怖份子', '心理諮商師', '間諜', '黑道', '幕後主使者', '刑警', '狗仔', '神秘學', '心理學', '恐怖主義', '整合的過程', '重新發現與挖掘的事件', '犯罪事件', '間諜與謀略事件', '禁忌的事', '鈽', '石油', '礦產', '寶藏', '墓園', '殯儀館', '太平間', '臨終病房', '生殖器'],
+        verb: ['揭露', '大掃除', '死亡', '蛻變', '掩埋', '調查', '挖掘', '控制', '掠奪']
+    }
+];
+
+        const signs = [
+            { name: '牡羊座', adj: ['單純的', '快速的', '獨立的', '直接的'], adv: ['快速地', '簡單地', '直接地', '勇敢地'] },
+            { name: '金牛座', adj: ['固執的', '優雅的', '平靜的', '珍貴的'], adv: ['緩慢地', '堅定地', '穩固地', '有禮貌地'] },
+            { name: '雙子座', adj: ['溝通的', '輕盈的', '靈敏的', '學習的'], adv: ['迅速地', '表面地', '吵雜地', '靈敏地'] },
+            { name: '巨蟹座', adj: ['情緒的', '保護的', '敏感的', '念舊的'], adv: ['舒適地', '濃厚地', '激動地', '不安地'] },
+            { name: '獅子座', adj: ['光亮的', '熱情的', '尊貴的', '自信的'], adv: ['張揚地', '無懼地', '大方地', '驕傲地'] },
+            { name: '處女座', adj: ['完美的', '挑剔的', '有用的', '健康的'], adv: ['節約地', '精確地', '焦慮地', '反覆地'] },
+            { name: '天秤座', adj: ['互助的', '社交的', '平衡的', '優雅的'], adv: ['猶豫地', '公正地', '得體地', '和諧地'] },
+            { name: '天蠍座', adj: ['忠實的', '私密的', '深層的', '重生的'], adv: ['深入地', '小心地', '極端地', '死心眼地'] },
+            { name: '射手座', adj: ['開心的', '慷慨的', '樂觀的', '理想的'], adv: ['宏觀地', '幸運地', '誇大地', '無心地'] },
+            { name: '摩羯座', adj: ['成熟的', '傳統的', '專業的', '權威的'], adv: ['緩慢地', '謹慎地', '節約地', '困難地'] },
+            { name: '水瓶座', adj: ['前衛的', '友善的', '進步的', '未來的'], adv: ['意外地', '突然地', '特別地', '激烈地'] },
+            { name: '雙魚座', adj: ['模糊的', '仁慈的', '犧牲的', '浪漫的'], adv: ['不明確地', '隱藏地', '迷糊地', '虛弱地'] }
+        ];
+
+        // Game State
+        let gameState = {
+            currentZodiac: null,
+            currentPlanet: null,
+            selectedAdj: null,
+            selectedAdv: null,
+            selectedNoun: null,
+            selectedVerb: null,
+            timeLeft: 60,
+            combinations: [],
+            gameActive: false,
+            timerInterval: null
+        };
+
+        // Create starfield
+        function createStars() {
+            const starsBg = document.getElementById('starsBg');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsBg.appendChild(star);
+            }
+        }
+
+        // Start game
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+
+            gameState.gameActive = true;
+            gameState.timeLeft = 60;
+            gameState.combinations = [];
+            gameState.selectedAdj = null;
+            gameState.selectedAdv = null;
+            gameState.selectedNoun = null;
+            gameState.selectedVerb = null;
+
+            generateNewPair();
+            startTimer();
+        }
+
+        // Generate new zodiac and planet pair
+        function generateNewPair() {
+            gameState.currentZodiac = signs[Math.floor(Math.random() * signs.length)];
+            gameState.currentPlanet = planets[Math.floor(Math.random() * planets.length)];
+            
+            gameState.selectedAdj = null;
+            gameState.selectedAdv = null;
+            gameState.selectedNoun = null;
+            gameState.selectedVerb = null;
+
+            renderZodiacWords();
+            renderPlanetWords();
+            updateCombineButton();
+        }
+
+        // Render zodiac words
+        function renderZodiacWords() {
+            document.getElementById('zodiacName').textContent = gameState.currentZodiac.name;
+            
+            const adjContainer = document.getElementById('adjContainer');
+            adjContainer.innerHTML = '';
+            gameState.currentZodiac.adj.forEach(word => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.textContent = word;
+                btn.onclick = () => selectAdj(btn, word);
+                adjContainer.appendChild(btn);
+            });
+
+            const advContainer = document.getElementById('advContainer');
+            advContainer.innerHTML = '';
+            gameState.currentZodiac.adv.forEach(word => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.textContent = word;
+                btn.onclick = () => selectAdv(btn, word);
+                advContainer.appendChild(btn);
+            });
+        }
+
+        // Render planet words
+        function renderPlanetWords() {
+            document.getElementById('planetName').textContent = gameState.currentPlanet.name;
+            
+            const nounContainer = document.getElementById('nounContainer');
+            nounContainer.innerHTML = '';
+            gameState.currentPlanet.noun.forEach(word => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.textContent = word;
+                btn.onclick = () => selectNoun(btn, word);
+                nounContainer.appendChild(btn);
+            });
+
+            const verbContainer = document.getElementById('verbContainer');
+            verbContainer.innerHTML = '';
+            gameState.currentPlanet.verb.forEach(word => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.textContent = word;
+                btn.onclick = () => selectVerb(btn, word);
+                verbContainer.appendChild(btn);
+            });
+        }
+
+        // Selection handlers
+        function selectAdj(btn, word) {
+            document.querySelectorAll('#adjContainer .word-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            gameState.selectedAdj = word;
+            updateCombineButton();
+        }
+
+        function selectAdv(btn, word) {
+            document.querySelectorAll('#advContainer .word-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            gameState.selectedAdv = word;
+            updateCombineButton();
+        }
+
+        function selectNoun(btn, word) {
+            document.querySelectorAll('#nounContainer .word-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            gameState.selectedNoun = word;
+            updateCombineButton();
+        }
+
+        function selectVerb(btn, word) {
+            document.querySelectorAll('#verbContainer .word-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            gameState.selectedVerb = word;
+            updateCombineButton();
+        }
+
+        // Update combine button state
+        function updateCombineButton() {
+            const allSelected = gameState.selectedAdj && gameState.selectedAdv && gameState.selectedNoun && gameState.selectedVerb;
+            document.getElementById('combineBtn').disabled = !allSelected;
+        }
+
+        // Combine words
+        function combineWords() {
+            const combination = {
+                zodiac: gameState.currentZodiac.name,
+                planet: gameState.currentPlanet.name,
+                phrase: `${gameState.selectedAdv}${gameState.selectedVerb} ${gameState.selectedAdj}${gameState.selectedNoun}`
+            };
+
+            gameState.combinations.push(combination);
+            document.getElementById('completedCount').textContent = gameState.combinations.length;
+
+            generateNewPair();
+        }
+
+        // Timer
+        function startTimer() {
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = gameState.timeLeft;
+
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameState.timerInterval);
+            gameState.gameActive = false;
+
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            document.getElementById('finalScore').textContent = gameState.combinations.length;
+
+            const combinationsList = document.getElementById('combinationsList');
+            combinationsList.innerHTML = '';
+            gameState.combinations.forEach((combo, index) => {
+                const item = document.createElement('div');
+                item.className = 'combination-item';
+                item.innerHTML = `
+                    <div class="header"><span class="planet">${combo.planet}</span>✕<span style="margin-left: 4px;">${combo.zodiac}</span></div>
+                    <div class="phrase">"${combo.phrase}"</div>
+                `;
+                combinationsList.appendChild(item);
+            });
+        }
+
+        // Restart game
+        function restartGame() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            startGame();
+        }
+
+        // Share result
+        function shareResult() {
+            const score = gameState.combinations.length;
+            const shareText = `🌟 我在《星光煉金術：1分鐘占星文法挑戰》中完成了 ${score} 組占星文法組合！你能超越我的成績嗎？✨`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '星光煉金術',
+                    text: shareText
+                }).catch(err => console.log('Share failed:', err));
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('分享文字已複製到剪貼板！');
+                });
+            }
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            createStars();
+        });
+    </script>
+</body>
+</html>
