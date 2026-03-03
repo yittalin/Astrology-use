@@ -476,7 +476,7 @@
   </div>
   <script>
         // Data
-const planets = [
+   const planets = [
     {
         name: '太陽',
         noun: ['父親', '男性伴侶', '英雄', '演員', '男主角', '生命中重要的人物', '生命的力量', '追求的事情', '成為英雄的事', '成就自己生命的事情', '自我的尋找', '黃金', '心臟', '發光發亮的東西', '光', '燈', '螢火', '向日葵', '電影院', '戲劇院', '表演舞台', '遊樂園', '健身房', '脊椎'],
@@ -696,8 +696,9 @@ const planets = [
             const combination = {
                 zodiac: gameState.currentZodiac.name,
                 planet: gameState.currentPlanet.name,
-                phrase: `${gameState.selectedAdv}${gameState.selectedVerb} ${gameState.selectedAdj}${gameState.selectedNoun}`
-    };
+                phrase: `${gameState.selectedAdv}${gameState.selectedVerb} ${gameState.selectedAdj}${gameState.selectedNoun}`
+            };
+
             gameState.combinations.push(combination);
             document.getElementById('completedCount').textContent = gameState.combinations.length;
 
